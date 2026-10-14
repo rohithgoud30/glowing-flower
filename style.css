@@ -1,0 +1,158 @@
+/* Page and 16:10 stage; sizes inside use cqi so everything scales with the stage width */
+* { margin: 0; box-sizing: border-box; }
+body {
+  height: 100dvh; overflow: hidden;
+  background: linear-gradient(#0a0a48 0%, #08083a 12%, #04041c 26%, #000 42%) fixed;
+  font-family: Poppins, system-ui, sans-serif;
+}
+
+.scene {
+  container-type: inline-size;
+  width: min(100vw, 160dvh);
+  aspect-ratio: 16 / 10;
+  position: absolute; bottom: 0; left: 50%; translate: -50% 0; overflow: hidden;
+}
+
+/* Phones and tablets: show the stage inside a bordered 16:9 frame */
+@media (orientation: portrait), (max-width: 1024px) {
+  html { background: #050e17; }
+  body {
+    position: fixed; top: 50%; left: 50%; translate: -50% -50%; height: auto;
+    width: min(94vw, 167dvh); aspect-ratio: 16 / 9; background-attachment: scroll;
+    border: 3px solid #dce3e5; box-shadow: 0 0 5px #dce3e580, inset 0 0 4px #dce3e580;
+  }
+  .scene { width: 90%; left: 5%; translate: none; }
+}
+
+/* One flower: an anchor point at its base that sways gently */
+.flower {
+  --u: calc(1cqi * var(--k));
+  position: absolute; left: var(--x); bottom: calc(var(--b) * 1cqi);
+  width: 0; height: 0; opacity: 1;
+  animation: sway 9s ease-in-out calc(var(--d) + 3s) infinite;
+  will-change: transform, rotate;
+}
+
+/* Glowing stem that grows upward */
+.flower-stem {
+  position: absolute; bottom: 0; left: calc(var(--u) * -.3);
+  width: calc(var(--u) * .6); height: calc(var(--h) * var(--u));
+  background: linear-gradient(#ff8a3c, #e05a22 55%, #6a1e0a);
+  opacity: calc(.5 + var(--o) * .5);
+  border-radius: 50%;
+  filter: blur(calc(var(--u) * .1)) drop-shadow(0 0 calc(var(--u) * .6) #ff6236);
+  transform-origin: bottom; transform: scaleY(0);
+  animation: grow 1.05s ease-out var(--d) forwards;
+}
+
+/* Leaves along the stem */
+.flower-petals {
+  position: absolute; bottom: 0; left: calc(var(--u) * -5.35);
+  width: calc(var(--u) * 10.7); height: calc(var(--h) * var(--u));
+  opacity: calc(.5 + var(--o) * .5);
+}
+.flower-petal {
+  position: absolute;
+  width: calc(var(--u) * 5.5); height: calc(var(--u) * 2.3);
+  background: linear-gradient(90deg, #4a1606, #c4501e 55%, #ff8a40);
+  filter: blur(calc(var(--u) * .25)) drop-shadow(0 0 calc(var(--u) * .5) rgba(255, 98, 54, .55));
+  scale: 0;
+  animation: leaf .45s ease-out calc(var(--d) + .22s + var(--n) * .06s) forwards;
+}
+.flower-petal_1 { top: 83%; left: 65%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(-45deg) scale(1); }
+.flower-petal_2 { top: 83%; left: -28%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(225deg) scale(1); }
+.flower-petal_3 { top: 72%; left: 65%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(-45deg) scale(1); }
+.flower-petal_4 { top: 72%; left: -28%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(225deg) scale(1); }
+.flower-petal_5 { top: 61%; left: 65%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(-45deg) scale(1); }
+.flower-petal_6 { top: 61%; left: -28%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(225deg) scale(1); }
+.flower-petal_7 { top: 50%; left: 65%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(-45deg) scale(1); }
+.flower-petal_9 { top: 39%; left: 65%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(-45deg) scale(1); }
+.flower-petal_10 { top: 39%; left: -28%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(225deg) scale(1); }
+.flower-petal_11 { top: 28%; left: 65%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(-45deg) scale(1); }
+.flower-petal_12 { top: 28%; left: -28%; border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%; transform: rotate(225deg) scale(1); }
+
+/* Leaf rule copied from the reference video */
+.flower-petal_8 {
+  top: 50%;
+  left: 10%;
+  border-radius: 0px 100% 50% 100% / 0px 100% 30% 100%;
+  transform: rotate(225deg) scale(1);
+}
+
+/* Curved grass blades around the base */
+.flower-grass {
+  position: absolute; bottom: 0; left: calc(var(--u) * var(--w) * -1.25);
+  width: calc(var(--u) * var(--w)); height: calc(var(--u) * var(--bh) * 1.3);
+  border-right: calc(var(--u) * .7) solid #c8501c; border-top: 0 solid #c8501c;
+  border-radius: 0 100% 0 0;
+  opacity: calc(var(--o) * .9);
+  filter: blur(calc(var(--u) * .15)) drop-shadow(0 0 calc(var(--u) * .5) #ff6236);
+  transform-origin: calc(100% + var(--u) * var(--w) * .25) 100%;
+  transform: scaleX(var(--dir)) scaleY(0);
+  animation: blade .6s ease-out var(--d) forwards;
+}
+
+/* Bloom: 8 almond petals tilted in 3D, opening one after another */
+.flower-head {
+  position: absolute; left: 0; bottom: calc(var(--h) * var(--u));
+  width: 0; height: 0;
+  --pw: calc(var(--u) * (3.9 + 6.55 * var(--k)));
+  filter: drop-shadow(0 0 calc(var(--pw) * .12) rgba(255, 140, 30, 1)) drop-shadow(0 0 calc(var(--pw) * .45) rgba(255, 110, 20, .9));
+  transform: perspective(calc(var(--u) * 30)) rotateX(var(--tilt)) rotateZ(var(--tz));
+}
+.flower-bloom {
+  position: absolute; bottom: 0; left: calc(var(--pw) * -1);
+  width: var(--pw); aspect-ratio: 1;
+  border-radius: 0 100% 0 100%;
+  background: radial-gradient(circle at 100% 100%, #fff7a0 0%, #ffe52c 25%, #ffc000 50%, #ff8700 75%, #f34b12 100%);
+  filter: blur(calc(var(--pw) * .025));
+  opacity: .8;
+  transform-origin: 100% 100%;
+  --ps: 1;
+  transform: rotate(var(--r)) scaleX(1) rotate(45deg) scale(0);
+  animation: bloom .28s cubic-bezier(.3, 1.4, .5, 1) calc(var(--d) + .9s + var(--i) * .11s) forwards;
+}
+.flower-core {
+  position: absolute; width: calc(var(--pw) * .65); height: calc(var(--pw) * .42);
+  left: calc(var(--pw) * -.325); bottom: calc(var(--pw) * -.21);
+  border-radius: 50%; background: #fff6ad;
+  opacity: 0; animation: show .25s ease-out calc(var(--d) + .82s) forwards;
+  filter: blur(calc(var(--pw) * .08)) drop-shadow(0 0 calc(var(--pw) * .3) #fff24a);
+}
+
+/* Light rules from the reference video */
+.flower-Light {
+  width: 3cqi;
+  aspect-ratio: 1;
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.flower-Light:nth-child(odd) {
+  background-color: #ffe4a0;
+  filter: blur(2cqi) drop-shadow(0 0 5cqi #ffd85f);
+}
+
+.flower-Light:nth-child(even) {
+  background-color: #ff6236;
+  filter: blur(2cqi) drop-shadow(8px 8px 5cqi #ff6236);
+}
+
+/* Growth animations */
+@keyframes grow  { to { transform: scaleY(1); } }
+@keyframes leaf  { to { scale: 1; } }
+@keyframes blade { to { transform: scaleX(var(--dir)) scaleY(1); } }
+@keyframes bloom { to { transform: rotate(var(--r)) scaleX(1) rotate(45deg) scale(var(--ps)); } }
+@keyframes show  { to { opacity: 1; } }
+@keyframes sway  { 0%, 100% { rotate: 0deg; } 25% { rotate: -3deg; } 75% { rotate: 3deg; } }
+
+/* Reduced motion: show the finished garden with no animation */
+@media (prefers-reduced-motion: reduce) {
+  .flower, .flower-head { animation: none; }
+  .flower-stem { animation: none; transform: scaleY(1); }
+  .flower-petal { animation: none; scale: 1; }
+  .flower-grass { animation: none; transform: scaleX(var(--dir)) scaleY(1); }
+  .flower-bloom { animation: none; transform: rotate(var(--r)) scaleX(1) rotate(45deg) scale(var(--ps)); }
+  .flower-core { animation: none; opacity: 1; }
+}
